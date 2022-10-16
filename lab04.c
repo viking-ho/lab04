@@ -11,7 +11,8 @@ int main(void)
     int r = 2, s_0, s, t, k; // parameters used in Dickson's
     // method, assisting variant s_0, variant k to find the
     // multiple of primitive triples
-    int N, n, tmp, tp, round = 0, cnt = 0;  // variants that
+    int N, n, tp, round = 0, cnt = 0;  // variants that
+    int rr;
     // help co-prime-checking, set boundaries, switch methods,
     // and count the sets
 
@@ -27,47 +28,44 @@ int main(void)
             while (n > 1){  // check if s, t are co-prime
                             // using Euclidean algorithm
                 N -= n * (N / n);
-                tmp = N; N = n; n = tmp;
+                if (N<=1) {
+                    n = N;
+                    break;
+                }
+                n -= N * (n / N);
             }
 
             if (n){         // if n == 1, s and t are co-prime
-                for (k = 1; k * (r + s + t) <= 20000; k++){
+                int rst = (r + s + t);
+                for (k = 1; k * rst <= 20000; k++){
                             // find the multiples of the triple
                             // under 20000
 
                     if (t < s){ // eliminate cases of a > b
                         printf("Pythagorean Triple #%d", ++cnt);
                         printf(" is (%d, %d, %d)\n", (r + t) *
-                               k, (r + s) * k, (r + s + t) * k);
+                               k, (r + s) * k, rst * k);
                     }
                     else {      // print normal cases
                         printf("Pythagorean Triple #%d", ++cnt);
                         printf(" is (%d, %d, %d)\n", (r + t) *
-                               k, (r + s) * k, (r + s + t) * k);
+                               k, (r + s) * k, rst * k);
                     }
                 }
             }
 
-
-            if (round) {        // find the next set of s, t if
-                                // the number of rounds
-                                // completed is odd
-                s_0 += 1; s = s_0 * s_0;
-                                // s is a square number
-                while ((r * r / 2) % s && s_0 < r){
-                                // if s is not a factor of r *
-                                // r / 2, find the next s
-                    s_0 += 1; s = s_0 * s_0;
-                }
-                t = r * r / 2 / s;
-                round = 0;
-            }
-            else {              // the number of rounds
+            rr = r * r / 2;
+            if ((round^=1)) {              // the number of rounds
                                 // completed is even
                 s *= 2;         // the extra "2" is on s now
-                t = r * r / 2 / s;
-                round = 1;
+            } else {            // find the next set of s, t if
+                                // the number of rounds
+                                // completed is odd
+                do {
+                    s_0 += 1; s = s_0 * s_0;
+                } while (rr % s && s_0 < r);
             }
+            t = rr / s;
         } while (s != tp);      // leave when all sets of legit
                                 // s, t are tried
         r += 2;                 // r is the next even number
